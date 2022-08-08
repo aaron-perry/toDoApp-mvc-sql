@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DotNetCoreSqlDb.Models;
+using Microsoft.ApplicationInsights;
 
 namespace DotNetCoreSqlDb.Controllers
 {
     public class TodosController : Controller
     {
         private readonly MyDatabaseContext _context;
+        private TelemetryClient telemetry = new TelemetryClient();
 
         public TodosController(MyDatabaseContext context)
         {
@@ -72,8 +74,12 @@ namespace DotNetCoreSqlDb.Controllers
             {
                 _context.Add(todo);
                 await _context.SaveChangesAsync();
+                telemetry.TrackEvent("Record Created");
                 return RedirectToAction(nameof(Index));
             }
+
+            
+
             return View(todo);
         }
 
